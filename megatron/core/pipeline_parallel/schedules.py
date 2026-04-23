@@ -143,7 +143,7 @@ def get_forward_backward_func(pp_size: Optional[int] = None, vp_size: Optional[i
     if pp_size is None and vp_size is None:
         pp_size = parallel_state.get_pipeline_model_parallel_world_size()
         vp_size = parallel_state.get_virtual_pipeline_model_parallel_world_size()
-
+    # VP与PP的区别就是为了减少通信bubble
     if pp_size > 1:
         if vp_size is not None:
             forward_backward_func = forward_backward_pipelining_with_interleaving
