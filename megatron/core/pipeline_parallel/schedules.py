@@ -426,6 +426,8 @@ def forward_step(
         unwrap_output_tensor = True
 
     set_input_tensor = get_attr_wrapped_model(model, "set_input_tensor")
+    # 注意这里对应Megatron-LM中的VP模式
+    # pytorch环境中我们只需要forward函数但是当存在VP情况下中间的GPU不是取dataloader的数据而是前一个GPU发来的数据
     set_input_tensor(input_tensor)
 
     if config.enable_autocast:
