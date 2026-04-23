@@ -241,7 +241,8 @@ def forward_step_calc_loss(
     """Calculate the loss and number of tokens for forward_step()"""
 
     from megatron.core.transformer.multi_token_prediction import MTPLossAutoScaler
-
+    
+    # 判断VP对象是否对应检查代码
     model_vp_stage = getattr(model, "vp_stage", None)
     if vp_stage is not None and model_vp_stage is not None:
         assert (
@@ -258,7 +259,9 @@ def forward_step_calc_loss(
         assert is_last_stage is not None, "is_last_stage must be provided"
         if is_last_stage:
             assert cp_group_size is not None, "cp_group_size must be provided on last stage"
-
+    """
+    计算loss的核心部分
+    """
     num_tokens = torch.tensor(0, dtype=torch.int)
     if is_last_stage:
         if loss_func is None:
