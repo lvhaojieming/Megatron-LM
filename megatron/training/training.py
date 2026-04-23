@@ -1824,11 +1824,17 @@ def train_step(forward_step_func, data_iterator, model, optimizer, opt_param_sch
     while rerun_state_machine.should_run_forward_backward(data_iterator):
         # Set grad to zero.
         for model_chunk in model:
+            # 这个部分注意pytorch与megatron-lm之间的区别
+            """
+            megatron-lm中存在Gradient Buffer每个批次迭代的时候都需要清空梯度缓存区
+            （重要的工程trick）
+            """
             model_chunk.zero_grad_buffer()
             # If saving main_grads in this iteration, then all-reduce instead of reduce-scatter.
             model_chunk.force_all_reduce = save_wgrads_in_this_iteration
+        # 清空优化器
         optimizer.zero_grad()
-
+        # 开启模型的蒸馏
         if has_nvidia_modelopt:
             # [ModelOpt]: Pipeline-parallel Distillation stacks student and teacher tensors
             adjust_tensor_shapes_fn = get_tensor_shapes_adjust_fn_for_distillation(
