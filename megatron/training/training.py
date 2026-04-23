@@ -1796,6 +1796,7 @@ def train_step(forward_step_func, data_iterator, model, optimizer, opt_param_sch
     timers = get_timers()
 
     rerun_state_machine = get_rerun_state_machine()
+    # 是否保存相关的参数数据
     save_params_in_this_iteration = (args.save_params_interval is not None and
                                      (iteration + 1) % args.save_params_interval == 0)
     save_activations_in_this_iteration = (args.save_activations_interval is not None and
@@ -1806,6 +1807,20 @@ def train_step(forward_step_func, data_iterator, model, optimizer, opt_param_sch
                                      (iteration + 1) % args.save_wgrads_interval == 0)
     save_dgrads_in_this_iteration = (args.save_dgrads_interval is not None and
                                      (iteration + 1) % args.save_dgrads_interval == 0)
+    # 清理模型的梯度等等
+    # 这个部分的状态机很重要是megatron-lm中的核心
+    """
+    正常流程 (Happy Path)
+    状态机检查当前状态，should_run_forward_backward 返回 True。
+
+    程序进入 while 循环，清理梯度，执行前向和反向传播。
+
+    计算出 Loss 之后，代码会调用状态机的验证器：rerun_state_machine.validate_result(loss, ...)。
+
+    验证器检查 Loss 正常（没有 NaN），状态流转到“成功”，should_run_forward_backward 变为 False。
+
+    退出 while 循环，更新参数，进入下一个 iteration。
+    """
     while rerun_state_machine.should_run_forward_backward(data_iterator):
         # Set grad to zero.
         for model_chunk in model:
