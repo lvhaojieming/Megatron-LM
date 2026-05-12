@@ -168,7 +168,9 @@ def get_batch(data_iterator, vp_stage: Optional[int] = None):
 # define spiky loss as a loss that's 10x the max loss observed
 SPIKY_LOSS_FACTOR = 10
 
-
+"""
+这部分是核心内容
+"""
 def loss_func(
     loss_mask: torch.Tensor, output_tensor: torch.Tensor, model: Optional[GPTModel] = None
 ):
@@ -358,7 +360,7 @@ def train_valid_test_datasets_provider(train_val_test_num_samples, vp_stage=None
 
     config = core_gpt_dataset_config_from_args(args)
 
-
+    # 这个参数是区分SFT还是预训练的关键参数
     is_packed_sequence = False
     if args.sft:
         dataset_type = SFTDataset
