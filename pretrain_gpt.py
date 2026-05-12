@@ -61,7 +61,9 @@ except ImportError:
 
 stimer = StragglerDetector()
 
-
+"""
+这部分最重要的区别就是CP,TP,DP,PP等状态下哪些具体的rank需要构造出batch
+"""
 def get_batch(data_iterator, vp_stage: Optional[int] = None):
     """Generate a batch.
 
